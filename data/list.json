@@ -1,0 +1,21 @@
+{
+    "rows": [ 
+        {
+            "name"    : "tags-section",
+            "columns" : { "xs": 1, "sm": 1, "md": 1, "lg": 1, "xl": 1 },
+            "weight"  : 1,
+            "groups": [
+                {
+                    "widgets" : [
+                        {
+                            "widget"  : "tags-section",
+                            "cache"   : false,
+                            "weight"  : 1,
+                            "params"  : { }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

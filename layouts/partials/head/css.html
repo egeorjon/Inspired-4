@@ -1,0 +1,10 @@
+{{- $sassTemplate := resources.Get "scss/main.scss" -}}
+{{- $options := (dict "targetPath" "/css/style.css" "outputStyle" "enableSourceMap") -}}
+{{- $style := false -}}
+{{- if eq hugo.Environment "development" }}
+  {{- $style = $sassTemplate | resources.ToCSS $options -}}
+  <link href="{{- $style.RelPermalink -}}" rel="stylesheet" type="text/css" />
+{{- else -}}
+  {{- $style = $sassTemplate | resources.ToCSS $options | resources.Minify | resources.Fingerprint -}}
+  <link href="{{- $style.RelPermalink -}}" rel="stylesheet" type="text/css" crossorigin="anonymous" integrity="{{- $style.Data.Integrity -}}" />
+{{- end -}}

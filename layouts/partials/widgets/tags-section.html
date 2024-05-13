@@ -1,0 +1,26 @@
+{{- $current     := .current -}}
+{{- $heading_lev := int (.params.heading | default site.Data.defaults.widgets.tags_section.heading | default site.Data.defaults.widgets.heading) -}}
+{{- $heading_tag := printf "h%d" $heading_lev -}}
+{{- $title       := .params.title | default (i18n site.Data.defaults.widgets.tags_section.title) -}}
+<aside class="col widget widget-followme">
+    <div class="widget-inner">
+        {{- $tags_list := slice -}}
+        {{- $string    := "" -}}
+        {{- with $title -}}
+            {{- printf "<%s class=\"widget-title\">%s</%s>" $heading_tag . $heading_tag | safeHTML -}}
+        {{- end -}}
+        {{- range $current.Pages -}}
+            {{- with .GetTerms "tags" -}}
+                {{- range . -}}
+                    {{- $string = printf "<a href=\"%s\" title=\"%s\">%s</a>" .RelPermalink (humanize .LinkTitle) (strings.FirstUpper .Title) -}}
+                    {{- if in $tags_list $string | not -}}
+                        {{- $tags_list = $tags_list | append $string -}}
+                    {{- end -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+        <p class="sections-tag">
+            {{- delimit $tags_list "" | safeHTML -}}
+        </p>
+    </div><!-- end of widget-inner -->
+</aside><!-- end of col -->

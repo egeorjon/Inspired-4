@@ -1,0 +1,20 @@
+{{- $scripts_list := slice "bootstrap-533/js/collapse.js" 
+                           "bootstrap-533/js/offcanvas.js" 
+                           "js/main.js" -}}
+{{- $target := "/js/inspired4.js" -}}
+{{- if eq .Layout "search"        -}}
+  {{- $scripts_list = $scripts_list | append "fuse/dist/fuse.min.js" "js/search.js" -}}
+  {{- $target = "/js/inspired4-search.js" -}}
+{{- end -}}
+{{- $res := slice -}}
+{{- range $script := $scripts_list -}}
+  {{- with resources.Get $script -}}
+    {{- with . | js.Build (dict "minify" true) -}}
+      {{- $res = $res | append . -}}
+    {{- end -}}{{/* end of js.build */}}
+  {{- end -}}{{/* end of with resources.get */}}
+{{- end -}}{{/* end of range */}}
+{{- $final := $res | resources.Concat $target | fingerprint -}}
+{{- with $final -}}
+<script defer src="{{- .RelPermalink -}}" integrity="{{- .Data.Integrity -}}" crossorigin="anonymous"></script>
+{{- end -}}

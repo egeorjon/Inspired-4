@@ -1,0 +1,111 @@
+{{- define "main" -}}
+  {{- $current_page  := . -}}
+  {{- $post_format   := site.Params.postsList.postFormat | default site.Data.defaults.postslist.format  -}}
+  {{- $columns       := site.Params.postsList.Columns    | default site.Data.defaults.postslist.columns -}}
+  {{- $display_image := and (isset .Params "images") (site.Params.postslist.headerimage | default site.Data.defaults.postslist.headerimage) -}}
+  <header class="list-headline">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <h1 class="page-title">{{- .Title -}}</h1>
+          <p class="page-summary">
+            {{- with .Summary -}}
+              {{- . | markdownify -}}
+            {{- else -}}
+              {{- with .Description -}}
+                {{- . | markdownify -}}
+              {{- end -}}
+            {{- end -}}
+          </p>
+          {{- if $display_image -}}
+            <p class="page-summary-image">
+            {{- partial "image.html" (dict "current" $current_page "Destination" .Params.images "Title" $current_page.Title "Text" $current_page.Title "class" "img-center") -}}
+            </p>
+          {{- end -}}
+        </div><!-- end of col -->
+      </div><!-- end of row -->
+    </div><!-- end of container -->
+  </header>
+  {{- $partial_path := path.Join "posts-format" (printf "%s%s%s" "posts-list-" $post_format ".html") -}}
+  {{- $class        := partialCached "class-columns.html" $columns (delimit $columns "-") -}}
+  <section class="list-content">
+    <div class="container">
+      <div class="list-posts {{ $class -}}">
+          {{- range .Paginator.Pages -}}
+            <div class="col">
+              {{/*- partial $partial_path (dict "current" . "context" $current_page) -*/}}
+              <h2><a href="{{- .RelPermalink -}}">{{- .LinkTitle -}}</a></h2>
+              {{- .Summary -}}
+            </div><!-- end of col -->
+          {{- end -}}
+      </div><!-- end of row -->
+    </div><!-- end of container -->
+  </section>
+  <footer class="list-bottom">
+    {{- if gt .Paginator.TotalPages 1 -}}
+        {{- partial "inline/pagination.html" . -}}
+    {{- end -}}
+    {{- with site.Data.list.rows -}}
+        {{- partial "widget-area.html" (dict "current" $current_page "config" .) -}}
+    {{- end -}}
+  </footer>
+{{- end -}}
+{{- define "partials/inline/pagination.html" -}}
+  {{- $step := site.Params.postsList.paginator_step | default site.Data.defaults.postslist.paginator_step -}}
+  <div class="container">
+    <div class="row">
+      <nav class="col" aria-label="Page navigation">
+        {{- $paginator := .Paginator -}}
+        <ul class="pagination justify-content-center">
+        {{- if eq $paginator.PageNumber 1 -}}
+          <li class="page-item active">
+            <a aria-current="page" aria-label="Page 1" class="page-link" role="button">1</a>
+          </li>
+        {{- else -}}
+          {{- if $paginator.HasPrev -}}
+            <li class="page-item">
+              <a href="{{- $paginator.Prev.URL -}}" aria-label="Previous page ({{- $paginator.Prev.PageNumber -}})" title="Next page ({{- $paginator.Prev.PageNumber -}})" class="page-link" role="button"><span aria-hidden="true"><i class="bi-chevron-double-left"></i></span></a>
+            </li>
+          {{- end -}}
+          <li class="page-item">
+            <a href="{{- $paginator.First.URL -}}" aria-label="Page 1" class="page-link" role="button"><span aria-hidden="true">1</span></a>
+          </li>
+          {{- if gt $paginator.PageNumber (math.Add $step 1) -}}
+            <li class="page-item">
+              <a aria-label="dot" class="page-link" role="button"><span aria-hidden="true">...</span></a>
+            </li>
+          {{- end -}}
+        {{- end -}}
+        {{- $start := math.Max (math.Sub $paginator.PageNumber $step) 2 -}}
+        {{- $end   := math.Min (math.Add $paginator.PageNumber $step) (math.Sub $paginator.TotalPages 1) -}}
+        {{- range $paginator.Pagers -}}
+          {{- if and (ge .PageNumber $start) (le .PageNumber $end) -}}
+          <li class="page-item {{ if eq .PageNumber $paginator.PageNumber -}}active{{- end -}}" {{ if eq .PageNumber $paginator.PageNumber -}}aria-current="page"{{- end -}}>
+              <a class="page-link" {{ if ne .PageNumber $paginator.PageNumber -}}href="{{- .URL -}}"{{- end }} aria-label="Page {{ .PageNumber -}}" role="button">{{- .PageNumber -}}</a>
+          </li>
+          {{- end -}}
+        {{- end -}}
+        {{- if lt $end (math.Sub $paginator.TotalPages 1) -}}
+          <li class="page-item">
+            <a aria-label="dot" class="page-link" role="button"><span aria-hidden="true">...</span></a>
+          </li>
+        {{- end -}}
+        {{- if eq $paginator.PageNumber $paginator.TotalPages -}}
+          <li class="page-item active">
+            <a aria-current="page" aria-label="Page {{ $paginator.TotalPages -}}" class="page-link" role="button">{{- $paginator.TotalPages -}}</a>
+          </li>
+        {{- else -}}
+          <li class="page-item" >
+            <a class="page-link" href="{{- $paginator.Last.URL -}}" aria-label="Page {{ $paginator.TotalPages -}}" role="button">{{- $paginator.TotalPages -}}</a>
+          </li>   
+          {{- if $paginator.HasNext -}}       
+            <li class="page-item" >
+              <a class="page-link" href="{{- $paginator.Next.URL -}}" aria-label="Next page ({{- $paginator.Next.PageNumber -}})" title="Next page ({{- $paginator.Next.PageNumber -}})" role="button"><span aria-hidden="true"><i class="bi-chevron-double-right"></i></span></a>
+            </li>
+          {{- end -}}
+        {{- end -}}
+        </ul>
+      </div><!-- end of col -->
+    </div><!-- end of row -->
+  </div><!-- end of container -->
+{{- end -}}

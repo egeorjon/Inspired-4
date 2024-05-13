@@ -1,0 +1,39 @@
+{{- $current := .current -}}
+{{- range sort .config "weight" -}}
+  {{- $class := "row row-cols-1" -}}
+  {{- with .columns -}}
+    {{- $class = partialCached "class-columns.html" . (delimit . "-") -}}
+  {{- end -}}
+  {{- $width := "" -}}
+  {{- with .width -}}
+    {{- $width = " container-width" -}}
+  {{- end -}}
+  <div id="{{- .name -}}">
+    <div class="container{{- $width -}}">
+      <div class="{{- $class }} {{ with .Class -}}{{- . | safeHTML -}}{{- end -}}">
+        {{- range sort .groups "weight" -}}
+          {{- if gt (len .widgets) 1 -}}
+            {{- $class := "row row-cols-1" -}}
+            {{- with .columns -}}
+              {{- $class = partialCached "class-columns.html" . (delimit . "-") -}}
+            {{- end -}}
+            <div class="col">
+              <div id="{{- .name -}}" class="{{- $class }} {{ with .Class -}}{{- . | safeHTML -}}{{- end -}}">
+          {{- end -}}
+          {{- range sort .widgets "weight" -}}
+            {{- $path := path.Join "widgets" (printf "%s%s" .widget ".html") -}}
+            {{- if .cache -}}
+              {{- partialCached $path (dict "current" $current "params" .params) -}}
+            {{- else -}}
+              {{- partial $path (dict "current" $current "params" .params) -}}
+            {{- end -}}
+          {{- end -}}
+          {{- if gt (len .widgets) 1 -}}
+              </div><!-- row -->
+            </div><!-- end of col -->
+          {{- end -}}
+        {{- end -}}
+      </div><!-- end of row -->
+    </div><!-- end of container -->
+  </div><!-- widget-area -->
+{{- end -}}

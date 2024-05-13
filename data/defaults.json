@@ -1,0 +1,20 @@
+{
+    "postslist": {
+        "columns"       : { "xs": 1, "sm": 1, "md": 2, "lg": 2, "xl": 2 },
+        "paginator_step": 3,
+        "headerimage"   : true,
+        "format"        : "image-top",
+        "meta"          : {
+            "top"       : {},
+            "middle"    : { "1": "section", "2": "date", "3": "reading" },
+            "bottom"    : { "1": "tags", "2": "series" }
+        }
+    },
+    "widgets": {
+        "heading": 2,
+
+        "tags_section": {
+            "title": "Tags available in this section"
+        }
+    }
+}
